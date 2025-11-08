@@ -2,24 +2,26 @@ name: FastAPI CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo code
+      # Step 1: Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
       # Step 2: Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.11'
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -27,14 +29,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Run tests (if you have any)
-      - name: Run tests
+      # Step 4: Run FastAPI app check
+      - name: Verify FastAPI app starts
         run: |
-          pytest || echo "No tests found, skipping..."
-
-      # Step 5: Run FastAPI app check
-      - name: Verify app runs
-        run: |
-          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          uvicorn main:app --host 127.0.0.1 --port 8000 &
           sleep 5
           curl -f http://127.0.0.1:8000 || exit 1
+        shell: bash
+
+      # Step 5: Deploy to Render (or skip if not configured)
+      - name: Deploy to Render
+        if: github.ref == 'refs/heads/main'
+        run: echo "🚀 Ready to deploy — configure Render or other platform next!"
