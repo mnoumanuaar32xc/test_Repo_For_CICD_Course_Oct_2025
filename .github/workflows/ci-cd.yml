@@ -1,19 +1,35 @@
 name: FastAPI CI/CD Pipeline
 
 on:
+  # 1️⃣ Run automatically when code is pushed to main or dev branches
   push:
     branches:
       - main
+      - dev
+
+  # 2️⃣ Run when a Pull Request targets main or dev
   pull_request:
     branches:
       - main
+      - dev
+
+  # 3️⃣ Allow manual trigger from GitHub UI (Actions → Run workflow)
+  workflow_dispatch:
+
+  # 4️⃣ Trigger when a new release or tag is created
+  release:
+    types: [published, created]
+
+  # 5️⃣ Optional: Run nightly at 1:00 AM UTC
+  schedule:
+    - cron: "0 1 * * *"  # every day at 1 AM UTC
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -21,7 +37,7 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -29,7 +45,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Run FastAPI app check
+      # Step 4: Run tests or verify app
       - name: Verify FastAPI app starts
         run: |
           uvicorn main:app --host 127.0.0.1 --port 8000 &
@@ -37,7 +53,7 @@ jobs:
           curl -f http://127.0.0.1:8000 || exit 1
         shell: bash
 
-      # Step 5: Deploy to Render (or skip if not configured)
-      - name: Deploy to Render
+      # Step 5: Deployment step (placeholder)
+      - name: Deploy to server
         if: github.ref == 'refs/heads/main'
-        run: echo "🚀 Ready to deploy — configure Render or other platform next!"
+        run: echo "🚀 Deployment would happen here!"
