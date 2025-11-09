@@ -1,0 +1,23 @@
+name: Hello Pipeline 👋
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Your name (to greet)"
+        required: false
+        default: "Developer"
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print greeting
+        run: |
+          echo "👋 Hello, ${{ github.event.inputs.name || 'Developer' }}!"
+          echo "✅ The hello-pipeline ran successfully on branch: ${{ github.ref_name }}"
