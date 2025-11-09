@@ -1,0 +1,17 @@
+name: Echo Task Demo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  echo-task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Echo a message
+        run: echo "🚀 Hello from the Echo Task in FastAPI Project!"
